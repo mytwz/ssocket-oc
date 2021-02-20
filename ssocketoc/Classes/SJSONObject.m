@@ -27,7 +27,7 @@
 }
 
 -(NSMutableDictionary*) toJSONDict {
-    return [JSONObject parseDictionary:[ self toJSONString ]];
+    return [SJSONObject parseDictionary:[ self toJSONString ]];
 }
 
 -(NSMutableData*) toJSONData {
