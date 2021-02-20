@@ -8,10 +8,16 @@
 
 @import UIKit;
 #import "SSOCKETOCAppDelegate.h"
+#import "ssocketoc/SWebSocket.h"
 
 int main(int argc, char * argv[])
 {
     @autoreleasepool {
+        
+        NSString* json = @"{\"test\":{\"required string username\":0,\"required float amount\":1,\"required double amount2\":2}}";
+
+        
+        
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([SSOCKETOCAppDelegate class]));
     }
 }

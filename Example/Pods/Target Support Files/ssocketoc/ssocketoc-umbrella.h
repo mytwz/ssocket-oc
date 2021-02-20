@@ -10,6 +10,12 @@
 #endif
 #endif
 
+#import "SByteUtils.h"
+#import "SCode.h"
+#import "SEmitter.h"
+#import "SJSONObject.h"
+#import "SProtoBuf.h"
+#import "SWebSocket.h"
 
 FOUNDATION_EXPORT double ssocketocVersionNumber;
 FOUNDATION_EXPORT const unsigned char ssocketocVersionString[];
