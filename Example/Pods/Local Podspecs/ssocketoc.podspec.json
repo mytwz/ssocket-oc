@@ -1,0 +1,36 @@
+{
+  "name": "ssocketoc",
+  "version": "0.1.0",
+  "summary": "A short description of ssocketoc.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/mytwz/ssocket-oc",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "summer.li": "asd995633088@qq.com"
+  },
+  "source": {
+    "git": "https://github.com/mytwz/ssocket-oc.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source_files": "ssocketoc/Classes/**/*",
+  "dependencies": {
+    "AFNetworking": [
+      "~> 2.3"
+    ],
+    "GZIP": [
+
+    ],
+    "YYModel": [
+
+    ],
+    "SocketRocket": [
+
+    ]
+  }
+}
