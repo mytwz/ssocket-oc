@@ -3,7 +3,9 @@
 [![CI Status](https://img.shields.io/travis/summer.li/ssocketoc.svg?style=flat)](https://travis-ci.org/summer.li/ssocketoc)
 [![Version](https://img.shields.io/cocoapods/v/ssocketoc.svg?style=flat)](https://cocoapods.org/pods/ssocketoc)
 [![License](https://img.shields.io/cocoapods/l/ssocketoc.svg?style=flat)](https://cocoapods.org/pods/ssocketoc)
-[![Platform](https://img.shields.io/cocoapods/p/ssocketoc.svg?style=flat)](https://cocoapods.org/pods/ssocketoc)
+[![Platform](https://img.shields.io/cocoapods/p/ssocketoc.svg?style=flat)](https://cocoapods.org/pods/ssocketoc) 
+
+ > 仿 Koa 中间件控制的 WebSocket 服务对应的客户端程序，食用简单，上手容易, 支持 GZIP 解压缩和 ProtoBuffer 解压缩配置，觉得小弟写的还行的话，就给个[Star](https://github.com/mytwz/ssocket-oc)⭐️吧~
 
 ## Example
 
@@ -29,6 +31,8 @@ summer.li, asd995633088@qq.com
 ssocketoc is available under the MIT license. See the LICENSE file for more info.
 
 ## 使用方法
+### [点击安装服务端程序](https://github.com/mytwz/ssocket)
+
 ```object-c
 // ProtoBuf 解压缩配置
 NSString* json = @"{\"test\":{\"required string username\":0,\"required float amount\":1,\"required double amount2\":2}}";
