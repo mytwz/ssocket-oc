@@ -30,7 +30,9 @@
 
 @interface SWebSocket()<SRWebSocketDelegate>
 @property(nonatomic, assign) BOOL isPong;
-@end
+@property(nonatomic, strong) Reachability* hostReachability;
+@property(nonatomic, strong) Reachability* routeReachability;
+@end    
 @implementation SWebSocket
 -init:(NSString*)url {
     return [self init:url options:[NSDictionary new]];
@@ -52,46 +54,48 @@
         [code parseResponseJson:[options protos_response_json]];
     }
     
-    // 实例化 AFNetworkReachabilityManager
-    AFNetworkReachabilityManager* afManager = [AFNetworkReachabilityManager sharedManager];
+    // 监听网络状态
+    // Reachability 网络状态通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appReachaabilityChanegd:) name:kReachabilityChangedNotification object:nil];
+    // 检测指定服务器是否可达
+    self.hostReachability = [Reachability reachabilityWithHostName:@"www.baidu.com"];
+    // 检测默认路由是否可达
+    self.routeReachability = [Reachability reachabilityForInternetConnection];
     
-    /**
-     判断网络状态并处理
-     @param status 网络状态
-     AFNetworkReachabilityStatusUnknown             = 未知网络
-     AFNetworkReachabilityStatusNotReachable        = 没有网络
-     AFNetworkReachabilityStatusReachableViaWWAN    = 蜂窝网络（3g、4g、wwan）
-     AFNetworkReachabilityStatusReachableViaWiFi    = wifi网络
-     */
-    [afManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
-        switch (status) {
-            case AFNetworkReachabilityStatusUnknown:
-                NSLog(@"当前网络状态未知");
-                break;
-                
-            case AFNetworkReachabilityStatusNotReachable:
-                NSLog(@"网络已断开");
-                [self setStatus:SHUTDOWN];
-                break;
-                
-            default:
-                NSLog(@"网络已连接");
-                [self connection];
-                break;
-        }
-    }];
-    
-    // 开始监听
-    [afManager startMonitoring];
+    [self.hostReachability startNotifier];
+    [self.routeReachability startNotifier];
     
     return self;
 }
 
+-(void) appReachaabilityChanegd:(NSNotification*) not {
+    Reachability* reach = [not object];
+    if([reach isKindOfClass:[Reachability class]]){
+        if(self.hostReachability == reach || self.routeReachability == reach) {
+            NetworkStatus status = [reach currentReachabilityStatus];
+            if(status == NotReachable){
+                // 没有网络
+                NSLog(@"没网络");
+                self.status = SHUTDOWN;
+                [self close];
+            }
+            else if(status == ReachableViaWiFi || status == ReachableViaWWAN){
+                //  手机流量或者Wifi
+                NSLog(@"有网络");
+                [self connection];
+            }
+        }
+    }
+}
+
 -connection {
     @autoreleasepool {
+        if(self.status == OPENING) return self;
         if ([self status] == CLOSE || [self status] == SHUTDOWN) {
             socket = [[SRWebSocket alloc] initWithURLRequest: [NSURLRequest requestWithURL:[NSURL URLWithString:[self url]]]];
             socket.delegate = self;
+            self.isPong = true;
+            self.status = OPENING;
             [socket open];
             NSLog(@"发起 WebSocket 连接请求，地址是：%@",socket.url.absoluteString);
         }
@@ -100,9 +104,10 @@
 }
 
 -(void)close {
-    if (nil != socket && socket.readyState == SR_OPEN) {
+    if (nil != socket && self.status == CONNECTION) {
         @autoreleasepool {
             [self setStatus:SHUTDOWN];
+            [self onClose:4020 reason:@"client close"];
             [socket closeWithCode:4020 reason:@"client close!"];
         }
     }
@@ -181,13 +186,13 @@
 
 -(void)onClose:(int) code reason:(NSString*)reason {
     @autoreleasepool {
+        if(self.status == SHUTDOWN || self.status == CLOSE) return;
+        socket.delegate = nil;
         socket = nil;
-        [self emit:@"close" data:@{@"code": [NSNumber numberWithInteger:code], @"reason":reason}];
-        if([self status] != SHUTDOWN){
-            [self setStatus:CLOSE];
-            if(reconnection_count-- > 0){
-                [self performSelector:@selector(startReconnectioning) withObject:nil afterDelay:options.reconnection_time];
-            }
+        [self emit:@"close" data:@{@"code": [NSNumber numberWithInteger:code], @"reason":reason, @"status": [NSNumber numberWithInteger:self.status]}];
+        [self setStatus:CLOSE];
+        if(reconnection_count-- > 0){
+            [self performSelector:@selector(startReconnectioning) withObject:nil afterDelay:options.reconnection_time];
         }
     }
 }

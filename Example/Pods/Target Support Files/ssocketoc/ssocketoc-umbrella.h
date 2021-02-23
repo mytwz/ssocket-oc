@@ -15,6 +15,7 @@
 #import "SEmitter.h"
 #import "SJSONObject.h"
 #import "SProtoBuf.h"
+#import "SReachability.h"
 #import "SWebSocket.h"
 
 FOUNDATION_EXPORT double ssocketocVersionNumber;

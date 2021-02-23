@@ -36,7 +36,9 @@ extern enum SocketStatus {
     /**重连 */
     RECONNECTION,
     /*手动关闭*/
-    SHUTDOWN
+    SHUTDOWN,
+    /*正在连接*/
+    OPENING,
 };
 
 // 握手包

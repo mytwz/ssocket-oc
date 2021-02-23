@@ -17,7 +17,7 @@ int main(int argc, char * argv[])
         NSString* json = @"{\"test\":{\"required string username\":0,\"required float amount\":1,\"required double amount2\":2}}";
 
         
-        SWebSocket* socket = [[SWebSocket alloc] init:@"http://127.0.0.1:8080" options:@{@"protos_request_json":json, @"protos_response_json":json}];
+        SWebSocket* socket = [[SWebSocket alloc] init:@"http://10.9.16.34:8080" options:@{@"protos_request_json":json, @"protos_response_json":json}];
         
         [socket on:@"open" callback:^(id data){
             NSLog(@"SWebSocket: 连接打开[%@]", data);

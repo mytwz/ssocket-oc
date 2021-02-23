@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AFNetworking/AFNetworking.h>
+#import "SReachability.h"
 #import <SocketRocket/SocketRocket.h>
 #import "SEmitter.h"
 #import "SCode.h"
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @property(nonatomic, copy) NSString* ID;
 @property(nonatomic, assign) int status;
-@property(nonatomic, strong) NSString* url;
+@property(nonatomic, copy) NSString* url;
 
 -init:(NSString*)url;
 -init:(NSString*)url options:(NSDictionary*)options;
