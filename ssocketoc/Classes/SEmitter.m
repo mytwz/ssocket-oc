@@ -72,4 +72,14 @@
     }
 }
 
+-(int)listeners {
+    @autoreleasepool {
+        int count = 0;
+        for(NSString* event in [_callbacks allKeys]){
+            count += [self listeners:event];
+        }
+        return count;
+    }
+}
+
 @end

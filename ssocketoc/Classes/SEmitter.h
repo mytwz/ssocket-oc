@@ -23,6 +23,7 @@ typedef void (^event_callback)(id data);
 -emit:(NSString*)event data:(id)data;
 
 -(int)listeners:(NSString*) event;
+-(int)listeners;
 
 @end
 

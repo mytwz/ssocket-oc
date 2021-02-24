@@ -258,7 +258,12 @@
     @autoreleasepool {
         if (nil != socket && socket.readyState == SR_OPEN && self.status == CONNECTION) {
             int request_id = __index__++ > 999999 ? (__index__ = 1) : __index__;
-            [self once:[NSString stringWithFormat:@"%d", request_id] callback:callback];
+            NSString* ID = [NSString stringWithFormat:@"%d", request_id];
+            [self.requestIdDic setValue:ID forKey:ID];
+            [self once:ID callback:^(id data) {
+                callback(data);
+                [self.requestIdDic removeObjectForKey:ID];
+            }];
             NSMutableData* buffer = [code encodeDataPackage:path data:data request_id:request_id];
             [socket send:buffer];
         }
