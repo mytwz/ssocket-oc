@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ssocketoc'
-  s.version          = '1.0.1'
+  s.version          = '1.0.2'
   s.summary          = '对应 ssocket node 后端而写的 客户端框架'
 
 # This description is used to generate tags and improve search results.

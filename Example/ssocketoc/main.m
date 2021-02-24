@@ -17,7 +17,7 @@ int main(int argc, char * argv[])
         NSString* json = @"{\"test\":{\"required string username\":0,\"required float amount\":1,\"required double amount2\":2}}";
 
         
-        SWebSocket* socket = [[SWebSocket alloc] init:@"http://10.9.16.34:8080" options:@{@"protos_request_json":json, @"protos_response_json":json}];
+        SWebSocket* socket = [[SWebSocket alloc] init:@"http://127.0.0.1:8080" options:@{@"protos_request_json":json, @"protos_response_json":json}];
         
         [socket on:@"open" callback:^(id data){
             NSLog(@"SWebSocket: 连接打开[%@]", data);
@@ -33,11 +33,12 @@ int main(int argc, char * argv[])
         }];
         [socket on:@"connection" callback:^(id data){
             NSLog(@"SWebSocket: 握手完成[%@]", data);
-//            [socket request:@"test" data:@{@"username":@"12312313"} callback:^(id data){
-//                ResPacket* res = data;
-//                NSLog(@"SWebSocket: 事件响应[%@]", [res yy_modelToJSONString]);
-//            }];
-            [socket request:@"test" data:@{/*@"username":@"测试", */@"amount":@12.45631, @"amount2":@456.153156}];
+            [socket request:@"test" data:@{@"username":@"12312313"} callback:^(id data){
+                ResPacket* res = data;
+                NSLog(@"SWebSocket: 事件响应[%@]", [res yy_modelToJSONString]);
+            }];
+//            [socket request:@"test" data:@{/*@"username":@"测试", */@"amount":@12.45631, @"amount2":@456.153156}];
+            [socket close];
         }];
         [socket on:@"reconnection" callback:^(id data){
             NSLog(@"SWebSocket: 重连完成[%@]", data);
@@ -55,9 +56,10 @@ int main(int argc, char * argv[])
         [socket on:@"test" callback:^(id data){
             ResPacket* res = data;
             NSLog(@"SWebSocket: 收到服务端事件回应[%@]", [res yy_modelToJSONString]);
+            
         }];
 
-        
+        [socket connection];
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([SSOCKETOCAppDelegate class]));
     }
 }

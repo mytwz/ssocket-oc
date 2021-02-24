@@ -39,6 +39,8 @@ extern enum SocketStatus {
     SHUTDOWN,
     /*正在连接*/
     OPENING,
+    /**初始化*/
+    INIT,
 };
 
 // 握手包
@@ -73,7 +75,7 @@ extern enum SocketStatus {
 @private SProtoBuf* requestProtoBuf;
 @private SProtoBuf* responseProtoBuf;
 }
-
+-init;
 -(void) parseRequestJson:(NSString*) jsonString;
 -(void) parseResponseJson:(NSString*) jsonString;
 
