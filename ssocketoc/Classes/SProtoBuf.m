@@ -130,7 +130,7 @@ static const NSString* DATA_TYPE_MESSAGE = @"message";
             int length = [self write:[protosConfig objectForKey:proto_name] data:data2 buffer:buffer];
             return [SByteUtils slice:buffer offset:0 length:length];
         }
-        return [[NSMutableData alloc] initWithData:[[data2 yy_modelToJSONString] dataUsingEncoding:NSUTF8StringEncoding] ];
+        return [[NSMutableData alloc] initWithData:[[data2 modelToJSONString] dataUsingEncoding:NSUTF8StringEncoding] ];
     }
 }
 

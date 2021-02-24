@@ -54,7 +54,7 @@ int main(int argc, char * argv[])
 
         [socket on:@"test" callback:^(id data){
             ResPacket* res = data;
-            NSLog(@"SWebSocket: 收到服务端事件回应[%@]", [res yy_modelToJSONString]);
+            NSLog(@"SWebSocket: 收到服务端事件回应[%@]", [res modelToJSONString]);
         }];
 
         
