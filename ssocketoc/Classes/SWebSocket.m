@@ -32,6 +32,7 @@
 @property(nonatomic, assign) BOOL isPong;
 @property(nonatomic, strong) Reachability* hostReachability;
 @property(nonatomic, strong) Reachability* routeReachability;
+@property(nonatomic, strong) NSMutableDictionary* requestIdDic;
 @end    
 @implementation SWebSocket
 -init:(NSString*)url {
@@ -40,13 +41,14 @@
 -init:(NSString*)url options:(NSDictionary*)optdict{
     self = [super init];
     
-    code = [SCode new];
+    code = [[SCode alloc] init];
     __index__ = 0;
     options = [[SSOptions alloc] init:optdict];
     reconnection_count = [options reconnection_count];
-    [self setStatus:CLOSE];
-    [self setID:@""];
-    [self setUrl:url];
+    self.status = INIT;
+    self.ID = @"";
+    self.url = url;
+    self.requestIdDic = [NSMutableDictionary new];
     if(![@"" isEqualToString:[options protos_request_json]]){
         [code parseRequestJson:[options protos_request_json]];
     }
@@ -76,13 +78,17 @@
             if(status == NotReachable){
                 // 没有网络
                 NSLog(@"没网络");
-                self.status = SHUTDOWN;
-                [self close];
+                if(self.status == CONNECTION){
+                    self.status = SHUTDOWN;
+                    [self close];
+                }
             }
             else if(status == ReachableViaWiFi || status == ReachableViaWWAN){
                 //  手机流量或者Wifi
                 NSLog(@"有网络");
-                [self connection];
+                if(self.status == CLOSE){
+                    [self connection];
+                }
             }
         }
     }
@@ -91,7 +97,7 @@
 -connection {
     @autoreleasepool {
         if(self.status == OPENING) return self;
-        if ([self status] == CLOSE || [self status] == SHUTDOWN) {
+        if ([self status] == CLOSE || [self status] == SHUTDOWN || self.status == INIT) {
             socket = [[SRWebSocket alloc] initWithURLRequest: [NSURLRequest requestWithURL:[NSURL URLWithString:[self url]]]];
             socket.delegate = self;
             self.isPong = true;
@@ -140,6 +146,26 @@
     [self onClose:code reason:reason];
 }
 
+
+-(void)onClose:(int) code reason:(NSString*)reason {
+    @autoreleasepool {
+        if(self.status == CLOSE) return;
+        for(NSString* event in [self.requestIdDic allKeys]){
+            [self emit:event data:@{@"status":[NSNumber numberWithInteger:code], @"msg":@"socket colse!"}];
+        }
+        self.requestIdDic = [NSMutableDictionary new];
+        socket.delegate = nil;
+        socket = nil;
+        [self emit:@"close" data:@{@"code": [NSNumber numberWithInteger:code], @"reason":reason, @"status": [NSNumber numberWithInteger:self.status]}];
+        if(self.status != SHUTDOWN){
+            [self setStatus:CLOSE];
+            if(reconnection_count-- > 0){
+                [self performSelector:@selector(startReconnectioning) withObject:nil afterDelay:options.reconnection_time];
+            }
+        }
+    }
+}
+
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message {
     @try {
         if([message isKindOfClass:NSData.class]){
@@ -182,19 +208,6 @@
         
     }
     
-}
-
--(void)onClose:(int) code reason:(NSString*)reason {
-    @autoreleasepool {
-        if(self.status == SHUTDOWN || self.status == CLOSE) return;
-        socket.delegate = nil;
-        socket = nil;
-        [self emit:@"close" data:@{@"code": [NSNumber numberWithInteger:code], @"reason":reason, @"status": [NSNumber numberWithInteger:self.status]}];
-        [self setStatus:CLOSE];
-        if(reconnection_count-- > 0){
-            [self performSelector:@selector(startReconnectioning) withObject:nil afterDelay:options.reconnection_time];
-        }
-    }
 }
 
 -(void) startReconnectioning{
@@ -245,7 +258,12 @@
     @autoreleasepool {
         if (nil != socket && socket.readyState == SR_OPEN && self.status == CONNECTION) {
             int request_id = __index__++ > 999999 ? (__index__ = 1) : __index__;
-            [self once:[NSString stringWithFormat:@"%d", request_id] callback:callback];
+            NSString* ID = [NSString stringWithFormat:@"%d", request_id];
+            [self.requestIdDic setValue:ID forKey:ID];
+            [self once:ID callback:^(id data) {
+                callback(data);
+                [self.requestIdDic removeObjectForKey:ID];
+            }];
             NSMutableData* buffer = [code encodeDataPackage:path data:data request_id:request_id];
             [socket send:buffer];
         }

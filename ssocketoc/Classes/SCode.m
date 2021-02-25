@@ -42,12 +42,17 @@
 
 @implementation SCode
 
+-init{
+    self = [super init];
+    requestProtoBuf = [SProtoBuf new];
+    responseProtoBuf = [SProtoBuf new];
+    return self;
+}
+
 -(void) parseRequestJson:(NSString*) jsonString{
-    if(nil == requestProtoBuf) requestProtoBuf = [SProtoBuf new];
     [requestProtoBuf parse:jsonString];
 }
 -(void) parseResponseJson:(NSString*) jsonString{
-    if(nil == responseProtoBuf) responseProtoBuf = [SProtoBuf new];
     [responseProtoBuf parse:jsonString];
 }
 

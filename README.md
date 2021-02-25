@@ -79,5 +79,8 @@ SWebSocket* socket = [[SWebSocket alloc] init:@"http://127.0.0.1:8080" options:@
     ResPacket* res = data;
     NSLog(@"SWebSocket: 收到服务端事件回应[%@]", [res yy_modelToJSONString]);
 }];
-
+// 打开连接
+[socket connection];
+// 关闭连接
+[socket close];
 ```
