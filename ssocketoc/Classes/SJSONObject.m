@@ -15,15 +15,15 @@
 }
 
 +(NSString*) toJSONString:(NSMutableDictionary*) dict {
-    return [dict yy_modelToJSONString];
+    return [dict modelToJSONString];
 }
 
 +(instancetype) parseObject:(NSString*) json {
-    return [self yy_modelWithJSON: json];
+    return [self modelWithJSON:json];
 }
 
 -(NSString*) toJSONString {
-    return [self yy_modelToJSONString];
+    return [self modelToJSONString];
 }
 
 -(NSMutableDictionary*) toJSONDict {

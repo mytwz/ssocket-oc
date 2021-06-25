@@ -33,10 +33,24 @@ int main(int argc, char * argv[])
 //        }];
         [socket on:@"connection" callback:^(id data){
             NSLog(@"SWebSocket: 握手完成[%@]", data);
-            [socket request:@"test" data:@{@"username":@"12312313"} callback:^(id data){
-                ResPacket* res = data;
-                NSLog(@"SWebSocket: 事件响应[%@]", [res yy_modelToJSONString]);
-            }];
+        }];
+        [socket on:@"reconnection" callback:^(id data){
+            NSLog(@"SWebSocket: 重连完成[%@]", data);
+        }];
+        [socket on:@"pong" callback:^(id data){
+            NSLog(@"SWebSocket: 收到服务器【pong】回应[%@]", data);
+        }];
+        [socket on:@"ping" callback:^(id data){
+            NSLog(@"SWebSocket: 向服务器发起【ping】请求[%@]", data);
+        }];
+        [socket on:@"reconnectioning" callback:^(id data){
+            NSLog(@"SWebSocket: 正在重新连接[%@]", data);
+        }];
+
+        [socket on:@"test" callback:^(id data){
+            ResPacket* res = data;
+            NSLog(@"SWebSocket: 收到服务端事件回应[%@]", [res modelToJSONString]);
+
 //            [socket request:@"test" data:@{/*@"username":@"测试", */@"amount":@12.45631, @"amount2":@456.153156}];
             [socket close];
             NSLog(@"asdad: %d", [socket listeners]);// 3
